@@ -28,11 +28,14 @@ pub fn main() !void {
     std.debug.print("Made socket: {f}\n", .{socket});
 
     // --- Construct Ethernet Frame ---
+    const payload: [16]u8 = .{ 'h', 'e', 'l', 'l', 'o', ',', ' ', 'e', 't', 'h', 'e', 'r', 'n', 'e', 't', '!' };
     const frame = Frame{
         .src_addr = socket.interface_mac[0..6].*,
-        .dst_addr = @splat(0xff), // broadcast address
-        .ether_type = 8 * 16,
-        .data = [16]u8{ 'H', 'e', 'l', 'l', 'o', ',', ' ', 'e', 't', 'h', 'e', 'r', 'n', 'e', 't', '!' },
+        // broadcast address
+        .dst_addr = @splat(0xff),
+        // ether_type < 1500 indicates payload length
+        .ether_type = @sizeOf(@TypeOf(payload)),
+        .data = payload,
     };
     std.debug.print("We have a frame: {f}\n", .{frame});
 

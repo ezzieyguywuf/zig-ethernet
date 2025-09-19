@@ -21,8 +21,9 @@ pub fn main() !void {
     }
     const interface_name = args[1];
 
-    // Filter incoming packets - only accept 0x0080 byte packets
-    const socket = try Socket.init(interface_name, 0x0080);
+    // Filter incoming packets - only accept IEEE 802.2 packets (e.g. with an
+    // "ethertype" < 1500
+    const socket = try Socket.init(interface_name, std.os.linux.ETH.P.@"802_2");
     defer socket.deinit();
 
     std.debug.print("Made socket: {f}\n", .{socket});
@@ -31,7 +32,7 @@ pub fn main() !void {
     // This tells the kernel to only deliver packets from this interface.
     const bind_addr = std.os.linux.sockaddr.ll{
         .family = c.AF_PACKET,
-        .protocol = std.mem.nativeToBig(u16, c.ETH_P_ALL),
+        .protocol = std.mem.nativeToBig(u16, std.os.linux.ETH.P.@"802_2"),
         .ifindex = socket.interface_index,
         .hatype = 0,
         .pkttype = 0,
