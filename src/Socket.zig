@@ -1,11 +1,5 @@
 const std = @import("std");
 
-// Import C headers for low-level socket programming
-const c = @cImport({
-    @cInclude("sys/socket.h");
-    @cInclude("linux/if_ether.h");
-});
-
 pub const Socket = struct {
     socket_filedescriptor: std.posix.socket_t,
     interface_index: c_int,
@@ -16,7 +10,7 @@ pub const Socket = struct {
         // AF_PACKET: Low-level packet interface
         // SOCK_RAW: Raw network protocol access
         // htons(ETH_P_ALL): All Ethernet protocols
-        const socket_fd = try std.posix.socket(c.AF_PACKET, c.SOCK_RAW, std.mem.nativeToBig(u16, protocol));
+        const socket_fd = try std.posix.socket(std.c.AF.PACKET, std.c.SOCK.RAW, std.mem.nativeToBig(u16, protocol));
 
         var ifreq = std.mem.zeroInit(std.posix.ifreq, .{});
         if (interface_name.len >= ifreq.ifrn.name.len) return error.InterfaceNameTooLong;

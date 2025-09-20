@@ -1,12 +1,6 @@
 const std = @import("std");
 const Socket = @import("Socket.zig").Socket;
 
-// Import C headers for low-level socket programming
-const c = @cImport({
-    @cInclude("sys/socket.h");
-    @cInclude("linux/if_ether.h");
-});
-
 const Frame = @import("Frame.zig").Frame;
 pub fn main() !void {
     // --- Get interface name from command line arguments ---
@@ -31,7 +25,7 @@ pub fn main() !void {
     // --- Bind socket to the specific interface ---
     // This tells the kernel to only deliver packets from this interface.
     const bind_addr = std.os.linux.sockaddr.ll{
-        .family = c.AF_PACKET,
+        .family = std.c.AF.PACKET,
         .protocol = std.mem.nativeToBig(u16, std.os.linux.ETH.P.@"802_2"),
         .ifindex = socket.interface_index,
         .hatype = 0,

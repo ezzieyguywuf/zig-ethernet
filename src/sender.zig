@@ -2,12 +2,6 @@ const std = @import("std");
 const Frame = @import("Frame.zig").Frame;
 const Socket = @import("Socket.zig").Socket;
 
-// Import C headers for low-level socket programming
-const c = @cImport({
-    @cInclude("sys/socket.h");
-    @cInclude("linux/if_ether.h");
-});
-
 pub fn main() !void {
     // --- Get interface name from command line arguments ---
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -43,7 +37,7 @@ pub fn main() !void {
     std.debug.print("The packed bytes are: {x}\n", .{frame_bytes});
 
     const sock_addr = std.os.linux.sockaddr.ll{
-        .family = c.AF_PACKET,
+        .family = std.c.AF.PACKET,
         .protocol = std.mem.nativeToBig(u16, frame.ether_type),
         .ifindex = socket.interface_index,
         .hatype = 0,
